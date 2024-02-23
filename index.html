@@ -1,0 +1,972 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css"><link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-search.css">
+        <link rel="stylesheet" href="css/filter.css">
+<link rel="stylesheet" href="css/nouislider.min.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script><script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/leaflet-svg-shape-markers.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="js/leaflet-search.js"></script>
+        <script src="js/tailDT.js"></script>
+<script src="js/nouislider.min.js"></script>
+<script src="js/wNumb.js"></script>
+        <script src="data/Erf_corners_1.js"></script>
+        <script src="data/Block_corners_2.js"></script>
+        <script src="data/Erven_3.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        }).fitBounds([[-21.96982428364857,15.587272341555265],[-21.968265983377357,15.589456156724074]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        document.querySelector(".leaflet-popup-pane").addEventListener("load", function(event) {
+          var tagName = event.target.tagName,
+            popup = map._popup;
+          // Also check if flag is already set.
+          if (tagName === "IMG" && popup && !popup._updated) {
+            popup._updated = true; // Set flag to prevent looping.
+            popup.update();
+          }
+        }, true);
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_GoogleSatelliteHybrid_0');
+        map.getPane('pane_GoogleSatelliteHybrid_0').style.zIndex = 400;
+        var layer_GoogleSatelliteHybrid_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleSatelliteHybrid_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+        });
+        layer_GoogleSatelliteHybrid_0;
+        map.addLayer(layer_GoogleSatelliteHybrid_0);
+        function pop_Erf_corners_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Number</th>\
+                        <td>' + (feature.properties['Number'] !== null ? autolinker.link(feature.properties['Number'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Northing (</th>\
+                        <td>' + (feature.properties['Northing ('] !== null ? autolinker.link(feature.properties['Northing ('].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Easting (m</th>\
+                        <td>' + (feature.properties['Easting (m'] !== null ? autolinker.link(feature.properties['Easting (m'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Erf_corners_1_0() {
+            return {
+                pane: 'pane_Erf_corners_1',
+                radius: 4.8,
+                opacity: 1,
+                color: 'rgba(9,29,247,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(251,255,252,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Erf_corners_1');
+        map.getPane('pane_Erf_corners_1').style.zIndex = 401;
+        map.getPane('pane_Erf_corners_1').style['mix-blend-mode'] = 'normal';
+        var layer_Erf_corners_1 = new L.geoJson(json_Erf_corners_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Erf_corners_1',
+            layerName: 'layer_Erf_corners_1',
+            pane: 'pane_Erf_corners_1',
+            onEachFeature: pop_Erf_corners_1,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Erf_corners_1_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Erf_corners_1);
+        map.addLayer(layer_Erf_corners_1);
+        function pop_Block_corners_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Block_corners_2_0() {
+            return {
+                pane: 'pane_Block_corners_2',
+                shape: 'diamond',
+                radius: 7.2,
+                opacity: 1,
+                color: 'rgba(128,17,25,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(219,30,42,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Block_corners_2');
+        map.getPane('pane_Block_corners_2').style.zIndex = 402;
+        map.getPane('pane_Block_corners_2').style['mix-blend-mode'] = 'normal';
+        var layer_Block_corners_2 = new L.geoJson(json_Block_corners_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Block_corners_2',
+            layerName: 'layer_Block_corners_2',
+            pane: 'pane_Block_corners_2',
+            onEachFeature: pop_Block_corners_2,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.shapeMarker(latlng, style_Block_corners_2_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Block_corners_2);
+        map.addLayer(layer_Block_corners_2);
+        function pop_Erven_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Autogenera</th>\
+                        <td>' + (feature.properties['Autogenera'] !== null ? autolinker.link(feature.properties['Autogenera'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Name</th>\
+                        <td>' + (feature.properties['Name'] !== null ? autolinker.link(feature.properties['Name'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Area</th>\
+                        <td>' + (feature.properties['Area'] !== null ? autolinker.link(feature.properties['Area'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Perimeter</th>\
+                        <td>' + (feature.properties['Perimeter'] !== null ? autolinker.link(feature.properties['Perimeter'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Erven_3_0() {
+            return {
+                pane: 'pane_Erven_3',
+                opacity: 1,
+                color: 'rgba(253,252,252,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Erven_3');
+        map.getPane('pane_Erven_3').style.zIndex = 403;
+        map.getPane('pane_Erven_3').style['mix-blend-mode'] = 'normal';
+        var layer_Erven_3 = new L.geoJson(json_Erven_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Erven_3',
+            layerName: 'layer_Erven_3',
+            pane: 'pane_Erven_3',
+            onEachFeature: pop_Erven_3,
+            style: style_Erven_3_0,
+        });
+        bounds_group.addLayer(layer_Erven_3);
+        map.addLayer(layer_Erven_3);
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'<img src="legend/Erven_3.png" /> Erven': layer_Erven_3,'<img src="legend/Block_corners_2.png" /> Block_corners': layer_Block_corners_2,'<img src="legend/Erf_corners_1.png" /> Erf_corners': layer_Erf_corners_1,"Google Satellite Hybrid": layer_GoogleSatelliteHybrid_0,},{collapsed:false}).addTo(map);
+        setBounds();
+        map.addControl(new L.Control.Search({
+            layer: layer_Erven_3,
+            initial: false,
+            hideMarkerOnCollapse: true,
+            propertyName: 'Name'}));
+        document.getElementsByClassName('search-button')[0].className +=
+         ' fa fa-binoculars';
+        var mapDiv = document.getElementById('map');
+        var row = document.createElement('div');
+        row.className="row";
+        row.id="all";
+        row.style.height = "100%";
+        var col1 = document.createElement('div');
+        col1.className="col9";
+        col1.id = "mapWindow";
+        col1.style.height = "99%";
+        col1.style.width = "80%";
+        col1.style.display = "inline-block";
+        var col2 = document.createElement('div');
+        col2.className="col3";
+        col2.id = "menu";
+        col2.style.display = "inline-block";
+        mapDiv.parentNode.insertBefore(row, mapDiv);
+        document.getElementById("all").appendChild(col1);
+        document.getElementById("all").appendChild(col2);
+        col1.appendChild(mapDiv)
+        var Filters = {"Autogenera": "int","Number": "int","Northing (": "real","fid": "real","Easting (m": "real","Perimeter": "real","Area": "real","Name": "str"};
+        function filterFunc() {
+          map.eachLayer(function(lyr){
+          if ("options" in lyr && "dataVar" in lyr["options"]){
+            features = this[lyr["options"]["dataVar"]].features.slice(0);
+            try{
+              for (key in Filters){
+                keyS = key.replace(/[^a-zA-Z0-9_]/g, "")
+                if (Filters[key] == "str" || Filters[key] == "bool"){
+                  var selection = [];
+                  var options = document.getElementById("sel_" + keyS).options
+                  for (var i=0; i < options.length; i++) {
+                    if (options[i].selected) selection.push(options[i].value);
+                  }
+                    try{
+                      if (key in features[0].properties){
+                        for (i = features.length - 1;
+                          i >= 0; --i){
+                          if (selection.indexOf(
+                          features[i].properties[key])<0
+                          && selection.length>0) {
+                          features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                  }
+                }
+                if (Filters[key] == "int"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (parseInt(features[i].properties[key])
+                          < sliderVals[0]
+                          || parseInt(features[i].properties[key])
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "real"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (features[i].properties[key]
+                          < sliderVals[0]
+                          || features[i].properties[key]
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "date"
+                  || Filters[key] == "datetime"
+                  || Filters[key] == "time"){
+                  try{
+                    if (key in features[0].properties){
+                      HTMLkey = key.replace(/[&\/\\#,+()$~%.'":*?<>{} ]/g, '');
+                      startdate = document.getElementById("dat_" +
+                        HTMLkey + "_date1").value.replace(" ", "T");
+                      enddate = document.getElementById("dat_" +
+                        HTMLkey + "_date2").value.replace(" ", "T");
+                      for (i = features.length - 1; i >= 0; --i){
+                        if (features[i].properties[key] < startdate
+                          || features[i].properties[key] > enddate){
+                          features.splice(i,1);
+                        }
+                      }
+                    }
+                  } catch(err){
+                  }
+                }
+              }
+            } catch(err){
+            }
+          this[lyr["options"]["layerName"]].clearLayers();
+          this[lyr["options"]["layerName"]].addData(features);
+          }
+          })
+        }
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_Autogenera = document.createElement("div");
+            div_Autogenera.id = "div_Autogenera";
+            div_Autogenera.className = "slider";
+            document.getElementById("menu").appendChild(div_Autogenera);
+            var lab_Autogenera = document.createElement('div');
+            lab_Autogenera.innerHTML  = 'Autogenera: <span id="val_Autogenera"></span>';
+            lab_Autogenera.className = 'filterlabel';
+            document.getElementById("menu").appendChild(lab_Autogenera);
+            var reset_Autogenera = document.createElement('div');
+            reset_Autogenera.innerHTML = 'clear filter';
+            reset_Autogenera.className = 'filterlabel';
+            lab_Autogenera.className = 'filterlabel';
+            reset_Autogenera.onclick = function() {
+                sel_Autogenera.noUiSlider.reset();
+            };
+            document.getElementById("menu").appendChild(reset_Autogenera);
+            var sel_Autogenera = document.getElementById('div_Autogenera');
+            noUiSlider.create(sel_Autogenera, {
+                connect: true,
+                start: [1, 316],
+                step: 1,
+                format: wNumb({
+                    decimals: 0,
+                    }),
+                range: {
+                min: 1,
+                max: 316
+                }
+            });
+            sel_Autogenera.noUiSlider.on('update', function (values) {
+            filterVals =[];
+            for (value in values){
+            filterVals.push(parseInt(value))
+            }
+            val_Autogenera = document.getElementById('val_Autogenera');
+            val_Autogenera.innerHTML = values.join(' - ');
+                filterFunc()
+            });
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_Number = document.createElement("div");
+            div_Number.id = "div_Number";
+            div_Number.className = "slider";
+            document.getElementById("menu").appendChild(div_Number);
+            var lab_Number = document.createElement('div');
+            lab_Number.innerHTML  = 'Number: <span id="val_Number"></span>';
+            lab_Number.className = 'filterlabel';
+            document.getElementById("menu").appendChild(lab_Number);
+            var reset_Number = document.createElement('div');
+            reset_Number.innerHTML = 'clear filter';
+            reset_Number.className = 'filterlabel';
+            lab_Number.className = 'filterlabel';
+            reset_Number.onclick = function() {
+                sel_Number.noUiSlider.reset();
+            };
+            document.getElementById("menu").appendChild(reset_Number);
+            var sel_Number = document.getElementById('div_Number');
+            noUiSlider.create(sel_Number, {
+                connect: true,
+                start: [1, 723],
+                step: 1,
+                format: wNumb({
+                    decimals: 0,
+                    }),
+                range: {
+                min: 1,
+                max: 723
+                }
+            });
+            sel_Number.noUiSlider.on('update', function (values) {
+            filterVals =[];
+            for (value in values){
+            filterVals.push(parseInt(value))
+            }
+            val_Number = document.getElementById('val_Number');
+            val_Number.innerHTML = values.join(' - ');
+                filterFunc()
+            });
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_Northing = document.createElement("div");
+            div_Northing.id = "div_Northing";
+            div_Northing.className = "slider";
+            document.getElementById("menu").appendChild(div_Northing);
+            var lab_Northing = document.createElement('div');
+            lab_Northing.innerHTML  = 'Northing (: <span id="val_Northing"></span>';
+            lab_Northing.className = 'filterlabel';
+            document.getElementById("menu").appendChild(lab_Northing);
+            var reset_Northing = document.createElement('div');
+            reset_Northing.innerHTML = 'clear filter';
+            reset_Northing.className = 'filterlabel';
+            lab_Northing.className = 'filterlabel';
+            reset_Northing.onclick = function() {
+                sel_Northing.noUiSlider.reset();
+            };
+            document.getElementById("menu").appendChild(reset_Northing);
+            var sel_Northing = document.getElementById('div_Northing');
+            noUiSlider.create(sel_Northing, {
+                connect: true,
+                start: [-3545.129, -2855.999],
+                range: {
+                min: -3545.129,
+                max: -2855.999
+                }
+            });
+            sel_Northing.noUiSlider.on('update', function (values) {
+            val_Northing = document.getElementById('val_Northing');
+            val_Northing.innerHTML = values.join(' - ');
+                filterFunc()
+            });
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_fid = document.createElement("div");
+            div_fid.id = "div_fid";
+            div_fid.className = "slider";
+            document.getElementById("menu").appendChild(div_fid);
+            var lab_fid = document.createElement('div');
+            lab_fid.innerHTML  = 'fid: <span id="val_fid"></span>';
+            lab_fid.className = 'filterlabel';
+            document.getElementById("menu").appendChild(lab_fid);
+            var reset_fid = document.createElement('div');
+            reset_fid.innerHTML = 'clear filter';
+            reset_fid.className = 'filterlabel';
+            lab_fid.className = 'filterlabel';
+            reset_fid.onclick = function() {
+                sel_fid.noUiSlider.reset();
+            };
+            document.getElementById("menu").appendChild(reset_fid);
+            var sel_fid = document.getElementById('div_fid');
+            noUiSlider.create(sel_fid, {
+                connect: true,
+                start: [1.0, 657.0],
+                range: {
+                min: 1.0,
+                max: 657.0
+                }
+            });
+            sel_fid.noUiSlider.on('update', function (values) {
+            val_fid = document.getElementById('val_fid');
+            val_fid.innerHTML = values.join(' - ');
+                filterFunc()
+            });
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_Eastingm = document.createElement("div");
+            div_Eastingm.id = "div_Eastingm";
+            div_Eastingm.className = "slider";
+            document.getElementById("menu").appendChild(div_Eastingm);
+            var lab_Eastingm = document.createElement('div');
+            lab_Eastingm.innerHTML  = 'Easting (m: <span id="val_Eastingm"></span>';
+            lab_Eastingm.className = 'filterlabel';
+            document.getElementById("menu").appendChild(lab_Eastingm);
+            var reset_Eastingm = document.createElement('div');
+            reset_Eastingm.innerHTML = 'clear filter';
+            reset_Eastingm.className = 'filterlabel';
+            lab_Eastingm.className = 'filterlabel';
+            reset_Eastingm.onclick = function() {
+                sel_Eastingm.noUiSlider.reset();
+            };
+            document.getElementById("menu").appendChild(reset_Eastingm);
+            var sel_Eastingm = document.getElementById('div_Eastingm');
+            noUiSlider.create(sel_Eastingm, {
+                connect: true,
+                start: [-61053.098, -60731.202],
+                range: {
+                min: -61053.098,
+                max: -60731.202
+                }
+            });
+            sel_Eastingm.noUiSlider.on('update', function (values) {
+            val_Eastingm = document.getElementById('val_Eastingm');
+            val_Eastingm.innerHTML = values.join(' - ');
+                filterFunc()
+            });
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_Perimeter = document.createElement("div");
+            div_Perimeter.id = "div_Perimeter";
+            div_Perimeter.className = "slider";
+            document.getElementById("menu").appendChild(div_Perimeter);
+            var lab_Perimeter = document.createElement('div');
+            lab_Perimeter.innerHTML  = 'Perimeter: <span id="val_Perimeter"></span>';
+            lab_Perimeter.className = 'filterlabel';
+            document.getElementById("menu").appendChild(lab_Perimeter);
+            var reset_Perimeter = document.createElement('div');
+            reset_Perimeter.innerHTML = 'clear filter';
+            reset_Perimeter.className = 'filterlabel';
+            lab_Perimeter.className = 'filterlabel';
+            reset_Perimeter.onclick = function() {
+                sel_Perimeter.noUiSlider.reset();
+            };
+            document.getElementById("menu").appendChild(reset_Perimeter);
+            var sel_Perimeter = document.getElementById('div_Perimeter');
+            noUiSlider.create(sel_Perimeter, {
+                connect: true,
+                start: [70.09807798479267, 264.31142700820743],
+                range: {
+                min: 70.09807798479267,
+                max: 264.31142700820743
+                }
+            });
+            sel_Perimeter.noUiSlider.on('update', function (values) {
+            val_Perimeter = document.getElementById('val_Perimeter');
+            val_Perimeter.innerHTML = values.join(' - ');
+                filterFunc()
+            });
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_Area = document.createElement("div");
+            div_Area.id = "div_Area";
+            div_Area.className = "slider";
+            document.getElementById("menu").appendChild(div_Area);
+            var lab_Area = document.createElement('div');
+            lab_Area.innerHTML  = 'Area: <span id="val_Area"></span>';
+            lab_Area.className = 'filterlabel';
+            document.getElementById("menu").appendChild(lab_Area);
+            var reset_Area = document.createElement('div');
+            reset_Area.innerHTML = 'clear filter';
+            reset_Area.className = 'filterlabel';
+            lab_Area.className = 'filterlabel';
+            reset_Area.onclick = function() {
+                sel_Area.noUiSlider.reset();
+            };
+            document.getElementById("menu").appendChild(reset_Area);
+            var sel_Area = document.getElementById('div_Area');
+            noUiSlider.create(sel_Area, {
+                connect: true,
+                start: [303.247101808714, 4426.176012465575],
+                range: {
+                min: 303.247101808714,
+                max: 4426.176012465575
+                }
+            });
+            sel_Area.noUiSlider.on('update', function (values) {
+            val_Area = document.getElementById('val_Area');
+            val_Area.innerHTML = values.join(' - ');
+                filterFunc()
+            });
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_Name = document.createElement('div');
+            div_Name.id = "div_Name";
+            div_Name.className= "filterselect";
+            document.getElementById("menu").appendChild(div_Name);
+            sel_Name = document.createElement('select');
+            sel_Name.multiple = true;
+            sel_Name.size = 10;
+            sel_Name.id = "sel_Name";
+            var Name_options_str = "<option value='' unselected></option>";
+            sel_Name.onchange = function(){filterFunc()};
+            Name_options_str  += '<option value="Property : 431">Property : 431</option>';
+            Name_options_str  += '<option value="Property : 432">Property : 432</option>';
+            Name_options_str  += '<option value="Property : 433">Property : 433</option>';
+            Name_options_str  += '<option value="Property : 434">Property : 434</option>';
+            Name_options_str  += '<option value="Property : 435">Property : 435</option>';
+            Name_options_str  += '<option value="Property : 436">Property : 436</option>';
+            Name_options_str  += '<option value="Property : 437">Property : 437</option>';
+            Name_options_str  += '<option value="Property : 438">Property : 438</option>';
+            Name_options_str  += '<option value="Property : 439">Property : 439</option>';
+            Name_options_str  += '<option value="Property : 440">Property : 440</option>';
+            Name_options_str  += '<option value="Property : 441">Property : 441</option>';
+            Name_options_str  += '<option value="Property : 442">Property : 442</option>';
+            Name_options_str  += '<option value="Property : 443">Property : 443</option>';
+            Name_options_str  += '<option value="Property : 444">Property : 444</option>';
+            Name_options_str  += '<option value="Property : 445">Property : 445</option>';
+            Name_options_str  += '<option value="Property : 446">Property : 446</option>';
+            Name_options_str  += '<option value="Property : 447">Property : 447</option>';
+            Name_options_str  += '<option value="Property : 448">Property : 448</option>';
+            Name_options_str  += '<option value="Property : 449">Property : 449</option>';
+            Name_options_str  += '<option value="Property : 450">Property : 450</option>';
+            Name_options_str  += '<option value="Property : 451">Property : 451</option>';
+            Name_options_str  += '<option value="Property : 452">Property : 452</option>';
+            Name_options_str  += '<option value="Property : 453">Property : 453</option>';
+            Name_options_str  += '<option value="Property : 454">Property : 454</option>';
+            Name_options_str  += '<option value="Property : 455">Property : 455</option>';
+            Name_options_str  += '<option value="Property : 456">Property : 456</option>';
+            Name_options_str  += '<option value="Property : 457">Property : 457</option>';
+            Name_options_str  += '<option value="Property : 458">Property : 458</option>';
+            Name_options_str  += '<option value="Property : 459">Property : 459</option>';
+            Name_options_str  += '<option value="Property : 460">Property : 460</option>';
+            Name_options_str  += '<option value="Property : 461">Property : 461</option>';
+            Name_options_str  += '<option value="Property : 462">Property : 462</option>';
+            Name_options_str  += '<option value="Property : 463">Property : 463</option>';
+            Name_options_str  += '<option value="Property : 464">Property : 464</option>';
+            Name_options_str  += '<option value="Property : 465">Property : 465</option>';
+            Name_options_str  += '<option value="Property : 466">Property : 466</option>';
+            Name_options_str  += '<option value="Property : 467">Property : 467</option>';
+            Name_options_str  += '<option value="Property : 468">Property : 468</option>';
+            Name_options_str  += '<option value="Property : 469">Property : 469</option>';
+            Name_options_str  += '<option value="Property : 470">Property : 470</option>';
+            Name_options_str  += '<option value="Property : 471">Property : 471</option>';
+            Name_options_str  += '<option value="Property : 472">Property : 472</option>';
+            Name_options_str  += '<option value="Property : 473">Property : 473</option>';
+            Name_options_str  += '<option value="Property : 474">Property : 474</option>';
+            Name_options_str  += '<option value="Property : 475">Property : 475</option>';
+            Name_options_str  += '<option value="Property : 476">Property : 476</option>';
+            Name_options_str  += '<option value="Property : 477">Property : 477</option>';
+            Name_options_str  += '<option value="Property : 478">Property : 478</option>';
+            Name_options_str  += '<option value="Property : 479">Property : 479</option>';
+            Name_options_str  += '<option value="Property : 480">Property : 480</option>';
+            Name_options_str  += '<option value="Property : 481">Property : 481</option>';
+            Name_options_str  += '<option value="Property : 482">Property : 482</option>';
+            Name_options_str  += '<option value="Property : 483">Property : 483</option>';
+            Name_options_str  += '<option value="Property : 484">Property : 484</option>';
+            Name_options_str  += '<option value="Property : 485">Property : 485</option>';
+            Name_options_str  += '<option value="Property : 486">Property : 486</option>';
+            Name_options_str  += '<option value="Property : 487">Property : 487</option>';
+            Name_options_str  += '<option value="Property : 488">Property : 488</option>';
+            Name_options_str  += '<option value="Property : 489">Property : 489</option>';
+            Name_options_str  += '<option value="Property : 490">Property : 490</option>';
+            Name_options_str  += '<option value="Property : 491">Property : 491</option>';
+            Name_options_str  += '<option value="Property : 492">Property : 492</option>';
+            Name_options_str  += '<option value="Property : 493">Property : 493</option>';
+            Name_options_str  += '<option value="Property : 494">Property : 494</option>';
+            Name_options_str  += '<option value="Property : 495">Property : 495</option>';
+            Name_options_str  += '<option value="Property : 496">Property : 496</option>';
+            Name_options_str  += '<option value="Property : 497">Property : 497</option>';
+            Name_options_str  += '<option value="Property : 498">Property : 498</option>';
+            Name_options_str  += '<option value="Property : 499">Property : 499</option>';
+            Name_options_str  += '<option value="Property : 500">Property : 500</option>';
+            Name_options_str  += '<option value="Property : 501">Property : 501</option>';
+            Name_options_str  += '<option value="Property : 502">Property : 502</option>';
+            Name_options_str  += '<option value="Property : 503">Property : 503</option>';
+            Name_options_str  += '<option value="Property : 504">Property : 504</option>';
+            Name_options_str  += '<option value="Property : 505">Property : 505</option>';
+            Name_options_str  += '<option value="Property : 506">Property : 506</option>';
+            Name_options_str  += '<option value="Property : 507">Property : 507</option>';
+            Name_options_str  += '<option value="Property : 508">Property : 508</option>';
+            Name_options_str  += '<option value="Property : 509">Property : 509</option>';
+            Name_options_str  += '<option value="Property : 510">Property : 510</option>';
+            Name_options_str  += '<option value="Property : 511">Property : 511</option>';
+            Name_options_str  += '<option value="Property : 512">Property : 512</option>';
+            Name_options_str  += '<option value="Property : 513">Property : 513</option>';
+            Name_options_str  += '<option value="Property : 514">Property : 514</option>';
+            Name_options_str  += '<option value="Property : 515">Property : 515</option>';
+            Name_options_str  += '<option value="Property : 516">Property : 516</option>';
+            Name_options_str  += '<option value="Property : 517">Property : 517</option>';
+            Name_options_str  += '<option value="Property : 518">Property : 518</option>';
+            Name_options_str  += '<option value="Property : 519">Property : 519</option>';
+            Name_options_str  += '<option value="Property : 520">Property : 520</option>';
+            Name_options_str  += '<option value="Property : 522">Property : 522</option>';
+            Name_options_str  += '<option value="Property : 523">Property : 523</option>';
+            Name_options_str  += '<option value="Property : 524">Property : 524</option>';
+            Name_options_str  += '<option value="Property : 525">Property : 525</option>';
+            Name_options_str  += '<option value="Property : 526">Property : 526</option>';
+            Name_options_str  += '<option value="Property : 527">Property : 527</option>';
+            Name_options_str  += '<option value="Property : 528">Property : 528</option>';
+            Name_options_str  += '<option value="Property : 529">Property : 529</option>';
+            Name_options_str  += '<option value="Property : 530">Property : 530</option>';
+            Name_options_str  += '<option value="Property : 531">Property : 531</option>';
+            Name_options_str  += '<option value="Property : 532">Property : 532</option>';
+            Name_options_str  += '<option value="Property : 533">Property : 533</option>';
+            Name_options_str  += '<option value="Property : 534">Property : 534</option>';
+            Name_options_str  += '<option value="Property : 535">Property : 535</option>';
+            Name_options_str  += '<option value="Property : 536">Property : 536</option>';
+            Name_options_str  += '<option value="Property : 537">Property : 537</option>';
+            Name_options_str  += '<option value="Property : 538">Property : 538</option>';
+            Name_options_str  += '<option value="Property : 539">Property : 539</option>';
+            Name_options_str  += '<option value="Property : 540">Property : 540</option>';
+            Name_options_str  += '<option value="Property : 541">Property : 541</option>';
+            Name_options_str  += '<option value="Property : 542">Property : 542</option>';
+            Name_options_str  += '<option value="Property : 543">Property : 543</option>';
+            Name_options_str  += '<option value="Property : 544">Property : 544</option>';
+            Name_options_str  += '<option value="Property : 545">Property : 545</option>';
+            Name_options_str  += '<option value="Property : 546">Property : 546</option>';
+            Name_options_str  += '<option value="Property : 547">Property : 547</option>';
+            Name_options_str  += '<option value="Property : 548">Property : 548</option>';
+            Name_options_str  += '<option value="Property : 549">Property : 549</option>';
+            Name_options_str  += '<option value="Property : 550">Property : 550</option>';
+            Name_options_str  += '<option value="Property : 551">Property : 551</option>';
+            Name_options_str  += '<option value="Property : 552">Property : 552</option>';
+            Name_options_str  += '<option value="Property : 553">Property : 553</option>';
+            Name_options_str  += '<option value="Property : 554">Property : 554</option>';
+            Name_options_str  += '<option value="Property : 555">Property : 555</option>';
+            Name_options_str  += '<option value="Property : 556">Property : 556</option>';
+            Name_options_str  += '<option value="Property : 557">Property : 557</option>';
+            Name_options_str  += '<option value="Property : 558">Property : 558</option>';
+            Name_options_str  += '<option value="Property : 559">Property : 559</option>';
+            Name_options_str  += '<option value="Property : 560">Property : 560</option>';
+            Name_options_str  += '<option value="Property : 561">Property : 561</option>';
+            Name_options_str  += '<option value="Property : 562">Property : 562</option>';
+            Name_options_str  += '<option value="Property : 563">Property : 563</option>';
+            Name_options_str  += '<option value="Property : 564">Property : 564</option>';
+            Name_options_str  += '<option value="Property : 565">Property : 565</option>';
+            Name_options_str  += '<option value="Property : 566">Property : 566</option>';
+            Name_options_str  += '<option value="Property : 567">Property : 567</option>';
+            Name_options_str  += '<option value="Property : 568">Property : 568</option>';
+            Name_options_str  += '<option value="Property : 569">Property : 569</option>';
+            Name_options_str  += '<option value="Property : 570">Property : 570</option>';
+            Name_options_str  += '<option value="Property : 571">Property : 571</option>';
+            Name_options_str  += '<option value="Property : 572">Property : 572</option>';
+            Name_options_str  += '<option value="Property : 573">Property : 573</option>';
+            Name_options_str  += '<option value="Property : 574">Property : 574</option>';
+            Name_options_str  += '<option value="Property : 575">Property : 575</option>';
+            Name_options_str  += '<option value="Property : 576">Property : 576</option>';
+            Name_options_str  += '<option value="Property : 577">Property : 577</option>';
+            Name_options_str  += '<option value="Property : 578">Property : 578</option>';
+            Name_options_str  += '<option value="Property : 579">Property : 579</option>';
+            Name_options_str  += '<option value="Property : 580">Property : 580</option>';
+            Name_options_str  += '<option value="Property : 581">Property : 581</option>';
+            Name_options_str  += '<option value="Property : 582">Property : 582</option>';
+            Name_options_str  += '<option value="Property : 583">Property : 583</option>';
+            Name_options_str  += '<option value="Property : 584">Property : 584</option>';
+            Name_options_str  += '<option value="Property : 585">Property : 585</option>';
+            Name_options_str  += '<option value="Property : 586">Property : 586</option>';
+            Name_options_str  += '<option value="Property : 587">Property : 587</option>';
+            Name_options_str  += '<option value="Property : 588">Property : 588</option>';
+            Name_options_str  += '<option value="Property : 589">Property : 589</option>';
+            Name_options_str  += '<option value="Property : 590">Property : 590</option>';
+            Name_options_str  += '<option value="Property : 591">Property : 591</option>';
+            Name_options_str  += '<option value="Property : 592">Property : 592</option>';
+            Name_options_str  += '<option value="Property : 593">Property : 593</option>';
+            Name_options_str  += '<option value="Property : 594">Property : 594</option>';
+            Name_options_str  += '<option value="Property : 595">Property : 595</option>';
+            Name_options_str  += '<option value="Property : 596">Property : 596</option>';
+            Name_options_str  += '<option value="Property : 597">Property : 597</option>';
+            Name_options_str  += '<option value="Property : 598">Property : 598</option>';
+            Name_options_str  += '<option value="Property : 599">Property : 599</option>';
+            Name_options_str  += '<option value="Property : 600">Property : 600</option>';
+            Name_options_str  += '<option value="Property : 601">Property : 601</option>';
+            Name_options_str  += '<option value="Property : 602">Property : 602</option>';
+            Name_options_str  += '<option value="Property : 603">Property : 603</option>';
+            Name_options_str  += '<option value="Property : 604">Property : 604</option>';
+            Name_options_str  += '<option value="Property : 605">Property : 605</option>';
+            Name_options_str  += '<option value="Property : 606">Property : 606</option>';
+            Name_options_str  += '<option value="Property : 607">Property : 607</option>';
+            Name_options_str  += '<option value="Property : 608">Property : 608</option>';
+            Name_options_str  += '<option value="Property : 609">Property : 609</option>';
+            Name_options_str  += '<option value="Property : 610">Property : 610</option>';
+            Name_options_str  += '<option value="Property : 611">Property : 611</option>';
+            Name_options_str  += '<option value="Property : 612">Property : 612</option>';
+            Name_options_str  += '<option value="Property : 613">Property : 613</option>';
+            Name_options_str  += '<option value="Property : 614">Property : 614</option>';
+            Name_options_str  += '<option value="Property : 615">Property : 615</option>';
+            Name_options_str  += '<option value="Property : 616">Property : 616</option>';
+            Name_options_str  += '<option value="Property : 617">Property : 617</option>';
+            Name_options_str  += '<option value="Property : 618">Property : 618</option>';
+            Name_options_str  += '<option value="Property : 619">Property : 619</option>';
+            Name_options_str  += '<option value="Property : 620">Property : 620</option>';
+            Name_options_str  += '<option value="Property : 621">Property : 621</option>';
+            Name_options_str  += '<option value="Property : 622">Property : 622</option>';
+            Name_options_str  += '<option value="Property : 623">Property : 623</option>';
+            Name_options_str  += '<option value="Property : 624">Property : 624</option>';
+            Name_options_str  += '<option value="Property : 625">Property : 625</option>';
+            Name_options_str  += '<option value="Property : 626">Property : 626</option>';
+            Name_options_str  += '<option value="Property : 627">Property : 627</option>';
+            Name_options_str  += '<option value="Property : 628">Property : 628</option>';
+            Name_options_str  += '<option value="Property : 629">Property : 629</option>';
+            Name_options_str  += '<option value="Property : 630">Property : 630</option>';
+            Name_options_str  += '<option value="Property : 631">Property : 631</option>';
+            Name_options_str  += '<option value="Property : 632">Property : 632</option>';
+            Name_options_str  += '<option value="Property : 633">Property : 633</option>';
+            Name_options_str  += '<option value="Property : 634">Property : 634</option>';
+            Name_options_str  += '<option value="Property : 635">Property : 635</option>';
+            Name_options_str  += '<option value="Property : 636">Property : 636</option>';
+            Name_options_str  += '<option value="Property : 637">Property : 637</option>';
+            Name_options_str  += '<option value="Property : 638">Property : 638</option>';
+            Name_options_str  += '<option value="Property : 639">Property : 639</option>';
+            Name_options_str  += '<option value="Property : 640">Property : 640</option>';
+            Name_options_str  += '<option value="Property : 641">Property : 641</option>';
+            Name_options_str  += '<option value="Property : 642">Property : 642</option>';
+            Name_options_str  += '<option value="Property : 643">Property : 643</option>';
+            Name_options_str  += '<option value="Property : 644">Property : 644</option>';
+            Name_options_str  += '<option value="Property : 645">Property : 645</option>';
+            Name_options_str  += '<option value="Property : 646">Property : 646</option>';
+            Name_options_str  += '<option value="Property : 647">Property : 647</option>';
+            Name_options_str  += '<option value="Property : 648">Property : 648</option>';
+            Name_options_str  += '<option value="Property : 649">Property : 649</option>';
+            Name_options_str  += '<option value="Property : 650">Property : 650</option>';
+            Name_options_str  += '<option value="Property : 651">Property : 651</option>';
+            Name_options_str  += '<option value="Property : 652">Property : 652</option>';
+            Name_options_str  += '<option value="Property : 653">Property : 653</option>';
+            Name_options_str  += '<option value="Property : 654">Property : 654</option>';
+            Name_options_str  += '<option value="Property : 655">Property : 655</option>';
+            Name_options_str  += '<option value="Property : 656">Property : 656</option>';
+            Name_options_str  += '<option value="Property : 657">Property : 657</option>';
+            Name_options_str  += '<option value="Property : 658">Property : 658</option>';
+            Name_options_str  += '<option value="Property : 659">Property : 659</option>';
+            Name_options_str  += '<option value="Property : 660">Property : 660</option>';
+            Name_options_str  += '<option value="Property : 661">Property : 661</option>';
+            Name_options_str  += '<option value="Property : 662">Property : 662</option>';
+            Name_options_str  += '<option value="Property : 663">Property : 663</option>';
+            Name_options_str  += '<option value="Property : 664">Property : 664</option>';
+            Name_options_str  += '<option value="Property : 665">Property : 665</option>';
+            Name_options_str  += '<option value="Property : 666">Property : 666</option>';
+            Name_options_str  += '<option value="Property : 667">Property : 667</option>';
+            Name_options_str  += '<option value="Property : 668">Property : 668</option>';
+            Name_options_str  += '<option value="Property : 669">Property : 669</option>';
+            Name_options_str  += '<option value="Property : 670">Property : 670</option>';
+            Name_options_str  += '<option value="Property : 671">Property : 671</option>';
+            Name_options_str  += '<option value="Property : 672">Property : 672</option>';
+            Name_options_str  += '<option value="Property : 673">Property : 673</option>';
+            Name_options_str  += '<option value="Property : 674">Property : 674</option>';
+            Name_options_str  += '<option value="Property : 675">Property : 675</option>';
+            Name_options_str  += '<option value="Property : 676">Property : 676</option>';
+            Name_options_str  += '<option value="Property : 677">Property : 677</option>';
+            Name_options_str  += '<option value="Property : 678">Property : 678</option>';
+            Name_options_str  += '<option value="Property : 679">Property : 679</option>';
+            Name_options_str  += '<option value="Property : 680">Property : 680</option>';
+            Name_options_str  += '<option value="Property : 681">Property : 681</option>';
+            Name_options_str  += '<option value="Property : 682">Property : 682</option>';
+            Name_options_str  += '<option value="Property : 683">Property : 683</option>';
+            Name_options_str  += '<option value="Property : 684">Property : 684</option>';
+            Name_options_str  += '<option value="Property : 685">Property : 685</option>';
+            Name_options_str  += '<option value="Property : 686">Property : 686</option>';
+            Name_options_str  += '<option value="Property : 687">Property : 687</option>';
+            Name_options_str  += '<option value="Property : 688">Property : 688</option>';
+            Name_options_str  += '<option value="Property : 689">Property : 689</option>';
+            Name_options_str  += '<option value="Property : 690">Property : 690</option>';
+            Name_options_str  += '<option value="Property : 691">Property : 691</option>';
+            Name_options_str  += '<option value="Property : 692">Property : 692</option>';
+            Name_options_str  += '<option value="Property : 693">Property : 693</option>';
+            Name_options_str  += '<option value="Property : 694">Property : 694</option>';
+            Name_options_str  += '<option value="Property : 695">Property : 695</option>';
+            Name_options_str  += '<option value="Property : 696">Property : 696</option>';
+            Name_options_str  += '<option value="Property : 697">Property : 697</option>';
+            Name_options_str  += '<option value="Property : 698">Property : 698</option>';
+            Name_options_str  += '<option value="Property : 699">Property : 699</option>';
+            Name_options_str  += '<option value="Property : 700">Property : 700</option>';
+            Name_options_str  += '<option value="Property : 701">Property : 701</option>';
+            Name_options_str  += '<option value="Property : 702">Property : 702</option>';
+            Name_options_str  += '<option value="Property : 703">Property : 703</option>';
+            Name_options_str  += '<option value="Property : 704">Property : 704</option>';
+            Name_options_str  += '<option value="Property : 705">Property : 705</option>';
+            Name_options_str  += '<option value="Property : 706">Property : 706</option>';
+            Name_options_str  += '<option value="Property : 707">Property : 707</option>';
+            Name_options_str  += '<option value="Property : 708">Property : 708</option>';
+            Name_options_str  += '<option value="Property : 709">Property : 709</option>';
+            Name_options_str  += '<option value="Property : 710">Property : 710</option>';
+            Name_options_str  += '<option value="Property : 711">Property : 711</option>';
+            Name_options_str  += '<option value="Property : 712">Property : 712</option>';
+            Name_options_str  += '<option value="Property : 713">Property : 713</option>';
+            Name_options_str  += '<option value="Property : 714">Property : 714</option>';
+            Name_options_str  += '<option value="Property : 715">Property : 715</option>';
+            Name_options_str  += '<option value="Property : 716">Property : 716</option>';
+            Name_options_str  += '<option value="Property : 717">Property : 717</option>';
+            Name_options_str  += '<option value="Property : 718">Property : 718</option>';
+            Name_options_str  += '<option value="Property : 719">Property : 719</option>';
+            Name_options_str  += '<option value="Property : 720">Property : 720</option>';
+            Name_options_str  += '<option value="Property : 721">Property : 721</option>';
+            Name_options_str  += '<option value="Property : 722">Property : 722</option>';
+            Name_options_str  += '<option value="Property : 723">Property : 723</option>';
+            Name_options_str  += '<option value="Property : 724">Property : 724</option>';
+            Name_options_str  += '<option value="Property : 725">Property : 725</option>';
+            Name_options_str  += '<option value="Property : 726">Property : 726</option>';
+            Name_options_str  += '<option value="Property : 727">Property : 727</option>';
+            Name_options_str  += '<option value="Property : 728">Property : 728</option>';
+            Name_options_str  += '<option value="Property : 729">Property : 729</option>';
+            Name_options_str  += '<option value="Property : 730">Property : 730</option>';
+            Name_options_str  += '<option value="Property : 731">Property : 731</option>';
+            Name_options_str  += '<option value="Property : 732">Property : 732</option>';
+            Name_options_str  += '<option value="Property : 733">Property : 733</option>';
+            Name_options_str  += '<option value="Property : 734">Property : 734</option>';
+            Name_options_str  += '<option value="Property : 735">Property : 735</option>';
+            Name_options_str  += '<option value="Property : 736">Property : 736</option>';
+            Name_options_str  += '<option value="Property : 737">Property : 737</option>';
+            Name_options_str  += '<option value="Property : 738">Property : 738</option>';
+            Name_options_str  += '<option value="Property : 739">Property : 739</option>';
+            Name_options_str  += '<option value="Property : 740">Property : 740</option>';
+            Name_options_str  += '<option value="Property : 741">Property : 741</option>';
+            Name_options_str  += '<option value="Property : 742">Property : 742</option>';
+            Name_options_str  += '<option value="Property : 743">Property : 743</option>';
+            Name_options_str  += '<option value="Property : 744">Property : 744</option>';
+            Name_options_str  += '<option value="Property : 745">Property : 745</option>';
+            Name_options_str  += '<option value="Property : 746">Property : 746</option>';
+            Name_options_str  += '<option value="Property : 747">Property : 747</option>';
+            sel_Name.innerHTML = Name_options_str;
+            div_Name.appendChild(sel_Name);
+            var lab_Name = document.createElement('div');
+            lab_Name.innerHTML = 'Name';
+            lab_Name.className = 'filterlabel';
+            div_Name.appendChild(lab_Name);
+            var reset_Name = document.createElement('div');
+            reset_Name.innerHTML = 'clear filter';
+            reset_Name.className = 'filterlabel';
+            reset_Name.onclick = function() {
+                var options = document.getElementById("sel_Name").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_Name.appendChild(reset_Name);
+        </script>
+    </body>
+</html>
